@@ -1,5 +1,5 @@
 {
-  "name": "@mercury/gws",
+  "name": "@mercuryai/gws",
   "version": "0.1.0",
   "description": "Mercury extension: gws",
   "type": "module",

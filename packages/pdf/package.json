@@ -1,5 +1,5 @@
 {
-  "name": "@mercury/pdf",
+  "name": "@mercuryai/pdf",
   "version": "0.1.0",
   "description": "Mercury extension: pdf",
   "type": "module",

@@ -1,5 +1,5 @@
 {
-  "name": "@mercury/charts",
+  "name": "@mercuryai/charts",
   "version": "0.1.0",
   "description": "Mercury extension: charts",
   "type": "module",

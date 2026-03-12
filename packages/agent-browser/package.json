@@ -1,5 +1,5 @@
 {
-  "name": "@mercury/agent-browser",
+  "name": "@mercuryai/agent-browser",
   "version": "0.1.0",
   "description": "Mercury extension: agent-browser",
   "type": "module",

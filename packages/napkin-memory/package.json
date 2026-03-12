@@ -1,5 +1,5 @@
 {
-  "name": "@mercury/napkin-memory",
+  "name": "@mercuryai/napkin-memory",
   "version": "0.1.0",
   "description": "Obsidian-based knowledge vault with KB distillation for Mercury",
   "type": "module",

@@ -1,5 +1,5 @@
 {
-  "name": "@mercury/gh",
+  "name": "@mercuryai/gh",
   "version": "0.1.0",
   "description": "Mercury extension: gh",
   "type": "module",
