@@ -1,3 +1,4 @@
+import type { MercuryExtensionAPI } from "mercury-ai/extensions/types";
 import { Database } from "bun:sqlite";
 import { spawn } from "node:child_process";
 import {
@@ -255,17 +256,7 @@ function runDistiller(vaultDir: string, dateFile: string): Promise<boolean> {
 // Extension setup
 // ---------------------------------------------------------------------------
 
-export default function (mercury: {
-  cli(opts: { name: string; install: string }): void;
-  permission(opts: { defaultRoles: string[] }): void;
-  skill(relativePath: string): void;
-  on(event: string, handler: (event: any, ctx: any) => Promise<any>): void;
-  job(name: string, def: { interval?: number; cron?: string; run: (ctx: any) => Promise<void> }): void;
-  config(key: string, def: { description: string; default: string; validate?: (v: string) => boolean }): void;
-  widget(def: { label: string; render: (ctx: any) => string }): void;
-  env(def: { from: string; as?: string }): void;
-  store: { get(key: string): string | null; set(key: string, value: string): void };
-}) {
+export default function (mercury: MercuryExtensionAPI) {
   mercury.cli({ name: "napkin", install: "bun add -g napkin-ai" });
   mercury.permission({ defaultRoles: ["admin", "member"] });
   mercury.skill("./skill");

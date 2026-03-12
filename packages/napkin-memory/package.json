@@ -18,7 +18,11 @@
     "url": "https://github.com/badlogic/mercury-extensions",
     "directory": "packages/napkin-memory"
   },
+  "peerDependencies": {
+    "mercury-ai": ">=0.4.0"
+  },
   "devDependencies": {
+    "mercury-ai": "file:../../../mercury",
     "bun-types": "latest"
   }
 }
