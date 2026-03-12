@@ -118,7 +118,6 @@ export default function (mercury: MercuryExtensionAPI) {
 | `on(event, handler)` | Subscribe to lifecycle events (`startup`, `shutdown`, `workspace_init`, `before_container`, `after_container`) |
 | `job(name, def)` | Background job (interval or cron) |
 | `config(key, def)` | Per-space config key |
-| `widget(def)` | Dashboard HTML widget |
 | `store` | Scoped key-value persistence |
 
 Full API docs: [extensions.md](https://github.com/Michaelliv/mercury/blob/main/docs/extensions.md)
