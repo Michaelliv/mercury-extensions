@@ -6,18 +6,18 @@ Official extensions for [Mercury](https://github.com/Michaelliv/mercury).
 
 | Package | Description |
 |---------|-------------|
-| [`@mercuryai/napkin-memory`](packages/napkin-memory) | Obsidian-based knowledge vault with KB distillation |
-| [`@mercuryai/agent-browser`](packages/agent-browser) | Web browsing via Playwright/Chromium |
+| [`@mercuryai/knowledge`](packages/knowledge) | Obsidian-based knowledge vault with KB distillation |
+| [`@mercuryai/web-browser`](packages/web-browser) | Web browsing via Playwright/Chromium |
 | [`@mercuryai/charts`](packages/charts) | Chart generation |
-| [`@mercuryai/gh`](packages/gh) | GitHub CLI integration |
-| [`@mercuryai/gws`](packages/gws) | Google Workspace CLI |
-| [`@mercuryai/pdf`](packages/pdf) | PDF processing, OCR, and form filling |
+| [`@mercuryai/github`](packages/github) | GitHub CLI integration |
+| [`@mercuryai/google-workspace`](packages/google-workspace) | Google Workspace CLI |
+| [`@mercuryai/pdf-tools`](packages/pdf-tools) | PDF processing, OCR, and form filling |
 
 ## Installing in a Mercury project
 
 ```bash
 cd your-mercury-project
-mercury add @mercuryai/napkin-memory
+mercury add @mercuryai/knowledge
 ```
 
 ## Development

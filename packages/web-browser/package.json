@@ -1,7 +1,7 @@
 {
-  "name": "@mercuryai/pdf",
+  "name": "@mercuryai/web-browser",
   "version": "0.1.0",
-  "description": "Mercury extension: pdf",
+  "description": "Mercury extension: agent-browser",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Michaelliv/mercury-extensions",
-    "directory": "packages/pdf"
+    "directory": "packages/web-browser"
   },
   "peerDependencies": {
     "mercury-ai": ">=0.4.2"

@@ -1,11 +1,11 @@
 {
-  "name": "@mercuryai/gh",
+  "name": "@mercuryai/pdf-tools",
   "version": "0.1.0",
-  "description": "Mercury extension: gh",
+  "description": "Mercury extension: pdf",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": ["dist", "skill"],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Michaelliv/mercury-extensions",
-    "directory": "packages/gh"
+    "directory": "packages/pdf-tools"
   },
   "peerDependencies": {
     "mercury-ai": ">=0.4.2"

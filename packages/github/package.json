@@ -1,22 +1,22 @@
 {
-  "name": "@mercuryai/napkin-memory",
+  "name": "@mercuryai/github",
   "version": "0.1.0",
-  "description": "Obsidian-based knowledge vault with KB distillation for Mercury",
+  "description": "Mercury extension: gh",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "skill"],
+  "files": ["dist"],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "echo 'no tests yet'"
   },
-  "keywords": ["mercury", "extension", "obsidian", "napkin", "knowledge-base"],
+  "keywords": ["mercury", "extension"],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/badlogic/mercury-extensions",
-    "directory": "packages/napkin-memory"
+    "url": "https://github.com/Michaelliv/mercury-extensions",
+    "directory": "packages/github"
   },
   "peerDependencies": {
     "mercury-ai": ">=0.4.2"
