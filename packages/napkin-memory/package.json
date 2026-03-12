@@ -1,0 +1,24 @@
+{
+  "name": "@mercury/napkin-memory",
+  "version": "0.1.0",
+  "description": "Obsidian-based knowledge vault with KB distillation for Mercury",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "skill"],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'no tests yet'"
+  },
+  "keywords": ["mercury", "extension", "obsidian", "napkin", "knowledge-base"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/badlogic/mercury-extensions",
+    "directory": "packages/napkin-memory"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}

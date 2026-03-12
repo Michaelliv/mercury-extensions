@@ -1,0 +1,18 @@
+{
+  "name": "mercury-extensions",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "check": "bun run typecheck && bun run lint",
+    "check:fix": "bun run typecheck && bun run lint:fix",
+    "typecheck": "bun run --filter '*' typecheck",
+    "lint": "bunx @biomejs/biome check .",
+    "lint:fix": "bunx @biomejs/biome check --write .",
+    "test": "bun run --filter '*' test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "typescript": "^5.6.0"
+  }
+}
