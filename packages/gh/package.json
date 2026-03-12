@@ -5,18 +5,13 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "echo 'no tests yet'"
   },
-  "keywords": [
-    "mercury",
-    "extension"
-  ],
+  "keywords": ["mercury", "extension"],
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,4 +1,3 @@
-import type { MercuryExtensionAPI } from "mercury-ai/extensions/types";
 import { Database } from "bun:sqlite";
 import { spawn } from "node:child_process";
 import {
@@ -11,6 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { MercuryExtensionAPI } from "mercury-ai/extensions/types";
 
 const KNOWLEDGE_DIR = "knowledge";
 const VAULT_DIRS = ["people", "projects", "references", "daily", "templates"];
@@ -182,11 +182,7 @@ function md5(content: string): string {
   return new Bun.CryptoHasher("md5").update(content).digest("hex");
 }
 
-function exportMessages(
-  db: Database,
-  spaceId: string,
-  messagesDir: string,
-): Set<string> {
+function exportMessages(db: Database, spaceId: string, messagesDir: string): Set<string> {
   mkdirSync(messagesDir, { recursive: true });
 
   const rows = db
@@ -202,7 +198,7 @@ function exportMessages(
   for (const row of rows) {
     const date = formatDate(row.createdAt);
     if (!byDate.has(date)) byDate.set(date, []);
-    byDate.get(date)!.push({ ts: row.createdAt, role: row.role, content: row.content });
+    byDate.get(date)?.push({ ts: row.createdAt, role: row.role, content: row.content });
   }
 
   const changed = new Set<string>();
@@ -242,11 +238,15 @@ function runDistiller(vaultDir: string, dateFile: string): Promise<boolean> {
     );
 
     child.on("close", (code) => {
-      try { unlinkSync(promptFile); } catch {}
+      try {
+        unlinkSync(promptFile);
+      } catch {}
       resolve(code === 0);
     });
     child.on("error", () => {
-      try { unlinkSync(promptFile); } catch {}
+      try {
+        unlinkSync(promptFile);
+      } catch {}
       resolve(false);
     });
   });
@@ -324,9 +324,9 @@ export default function (mercury: MercuryExtensionAPI) {
 
         const db = new Database(dbPath, { readonly: true });
 
-        const spaces = db
-          .query("SELECT DISTINCT space_id as spaceId FROM messages")
-          .all() as { spaceId: string }[];
+        const spaces = db.query("SELECT DISTINCT space_id as spaceId FROM messages").all() as {
+          spaceId: string;
+        }[];
 
         for (const { spaceId } of spaces) {
           const spaceWorkspace = join(spacesDir, spaceId);
@@ -367,10 +367,7 @@ export default function (mercury: MercuryExtensionAPI) {
       } catch (err) {
         mercury.store.set("last-distill", new Date().toISOString());
         mercury.store.set("last-distill-status", "failed");
-        ctx.log.error(
-          "KB distillation failed",
-          err instanceof Error ? err : undefined,
-        );
+        ctx.log.error("KB distillation failed", err instanceof Error ? err : undefined);
       }
     },
   });

@@ -2,8 +2,7 @@ import type { MercuryExtensionAPI } from "mercury-ai/extensions/types";
 export default function (mercury: MercuryExtensionAPI) {
   mercury.cli({
     name: "agent-browser",
-    install:
-      "npm install -g agent-browser && npx playwright install --with-deps chromium",
+    install: "npm install -g agent-browser && npx playwright install --with-deps chromium",
   });
   mercury.permission({ defaultRoles: ["admin", "member"] });
   mercury.skill("./skill");
