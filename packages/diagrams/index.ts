@@ -7,8 +7,7 @@ export default function (mercury: {
 }) {
   mercury.cli({
     name: "mmdc",
-    install:
-      "npm install -g @mermaid-js/mermaid-cli && npx playwright install --with-deps chromium",
+    install: "npm install -g @mermaid-js/mermaid-cli",
   });
 
   mercury.permission({ defaultRoles: ["admin", "member"] });
