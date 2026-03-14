@@ -1,11 +1,6 @@
 import type { MercuryExtensionAPI } from "mercury-ai/extensions/types";
 
-export default function (mercury: {
-  cli(opts: { name: string; install: string }): void;
-  permission(opts: { defaultRoles: string[] }): void;
-  skill(relativePath: string): void;
-  env(def: { from: string }): void;
-}) {
+export default function (mercury: MercuryExtensionAPI) {
   mercury.cli({
     name: "psql",
     install:
