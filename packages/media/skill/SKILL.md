@@ -16,7 +16,7 @@ Always output files to `outbox/` so they get delivered back to the user.
 ffprobe -v quiet -print_format json -show_format -show_streams input.mp4
 
 # Image info
-magick identify -verbose input.jpg
+identify -verbose input.jpg
 ```
 
 ## ffmpeg
@@ -140,48 +140,50 @@ yt-dlp -f 22 -o "outbox/%(title)s.%(ext)s" "URL"
 
 ## imagemagick
 
+The container has ImageMagick v6. Use `convert` (not `magick`).
+
 ### Resize
 
 ```bash
 # By width (preserve aspect ratio)
-magick input.jpg -resize 800x outbox/resized.jpg
+convert input.jpg -resize 800x outbox/resized.jpg
 
 # By height
-magick input.jpg -resize x600 outbox/resized.jpg
+convert input.jpg -resize x600 outbox/resized.jpg
 
 # Exact dimensions (may distort)
-magick input.jpg -resize 800x600! outbox/resized.jpg
+convert input.jpg -resize 800x600! outbox/resized.jpg
 ```
 
 ### Crop
 
 ```bash
-magick input.jpg -crop 500x500+100+50 outbox/cropped.jpg
+convert input.jpg -crop 500x500+100+50 outbox/cropped.jpg
 ```
 
 ### Convert format
 
 ```bash
-magick input.png outbox/output.jpg
-magick input.jpg outbox/output.webp
+convert input.png outbox/output.jpg
+convert input.jpg outbox/output.webp
 ```
 
 ### Thumbnail (crop to fill)
 
 ```bash
-magick input.jpg -thumbnail 200x200^ -gravity center -extent 200x200 outbox/thumb.jpg
+convert input.jpg -thumbnail 200x200^ -gravity center -extent 200x200 outbox/thumb.jpg
 ```
 
 ### Composite / overlay
 
 ```bash
-magick base.jpg overlay.png -gravity southeast -composite outbox/result.jpg
+composite -gravity southeast overlay.png base.jpg outbox/result.jpg
 ```
 
 ### Strip metadata
 
 ```bash
-magick input.jpg -strip outbox/clean.jpg
+convert input.jpg -strip outbox/clean.jpg
 ```
 
 ### Batch operations
@@ -189,7 +191,7 @@ magick input.jpg -strip outbox/clean.jpg
 ```bash
 # Resize all images in inbox
 for f in inbox/*.jpg; do
-  magick "$f" -resize 800x "outbox/$(basename "$f")"
+  convert "$f" -resize 800x "outbox/$(basename "$f")"
 done
 ```
 
@@ -197,10 +199,10 @@ done
 
 ```bash
 # JPEG quality (1-100, lower = smaller)
-magick input.jpg -quality 75 outbox/compressed.jpg
+convert input.jpg -quality 75 outbox/compressed.jpg
 
 # WebP quality
-magick input.png -quality 80 outbox/output.webp
+convert input.png -quality 80 outbox/output.webp
 ```
 
 ## Platform size limits
@@ -217,7 +219,7 @@ When the user sends media from a platform, check these limits before producing o
 ## Key rules
 
 1. **Always output to `outbox/`** — this is how files get sent back to the user
-2. **Inspect first** — use `ffprobe` or `magick identify` before processing
+2. **Inspect first** — use `ffprobe` or `identify` before processing
 3. **Prefer `-c copy`** when no re-encoding is needed (faster, lossless)
 4. **Check output size** when targeting a size limit — retry with higher CRF / lower resolution if too large
 5. **Use `-y`** flag with ffmpeg to overwrite without prompting: `ffmpeg -y -i ...`

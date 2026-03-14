@@ -12,7 +12,7 @@ export default function (mercury: {
   });
 
   mercury.cli({
-    name: "magick",
+    name: "convert",
     install:
       "apt-get update && apt-get install -y --no-install-recommends imagemagick && rm -rf /var/lib/apt/lists/*",
   });
