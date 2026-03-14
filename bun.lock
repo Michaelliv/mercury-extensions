@@ -75,8 +75,63 @@
         "mercury-ai": ">=0.4.2",
       },
     },
+    "packages/mongodb": {
+      "name": "@mercuryai/mongodb",
+      "version": "0.1.0",
+      "devDependencies": {
+        "bun-types": "latest",
+        "mercury-ai": "0.4.2",
+      },
+      "peerDependencies": {
+        "mercury-ai": ">=0.4.2",
+      },
+    },
+    "packages/mysql": {
+      "name": "@mercuryai/mysql",
+      "version": "0.1.0",
+      "devDependencies": {
+        "bun-types": "latest",
+        "mercury-ai": "0.4.2",
+      },
+      "peerDependencies": {
+        "mercury-ai": ">=0.4.2",
+      },
+    },
     "packages/pdf-tools": {
       "name": "@mercuryai/pdf-tools",
+      "version": "0.1.0",
+      "devDependencies": {
+        "bun-types": "latest",
+        "mercury-ai": "0.4.2",
+      },
+      "peerDependencies": {
+        "mercury-ai": ">=0.4.2",
+      },
+    },
+    "packages/postgres": {
+      "name": "@mercuryai/postgres",
+      "version": "0.1.0",
+      "devDependencies": {
+        "bun-types": "latest",
+        "mercury-ai": "0.4.2",
+      },
+      "peerDependencies": {
+        "mercury-ai": ">=0.4.2",
+      },
+    },
+    "packages/redis": {
+      "name": "@mercuryai/redis",
+      "version": "0.1.0",
+      "devDependencies": {
+        "bun-types": "latest",
+        "mercury-ai": "0.4.2",
+      },
+      "peerDependencies": {
+        "mercury-ai": ">=0.4.2",
+      },
+    },
+    "packages/sqlite": {
+      "name": "@mercuryai/sqlite",
       "version": "0.1.0",
       "devDependencies": {
         "bun-types": "latest",
@@ -347,7 +402,17 @@
 
     "@mercuryai/media": ["@mercuryai/media@workspace:packages/media"],
 
+    "@mercuryai/mongodb": ["@mercuryai/mongodb@workspace:packages/mongodb"],
+
+    "@mercuryai/mysql": ["@mercuryai/mysql@workspace:packages/mysql"],
+
     "@mercuryai/pdf-tools": ["@mercuryai/pdf-tools@workspace:packages/pdf-tools"],
+
+    "@mercuryai/postgres": ["@mercuryai/postgres@workspace:packages/postgres"],
+
+    "@mercuryai/redis": ["@mercuryai/redis@workspace:packages/redis"],
+
+    "@mercuryai/sqlite": ["@mercuryai/sqlite@workspace:packages/sqlite"],
 
     "@mercuryai/web-browser": ["@mercuryai/web-browser@workspace:packages/web-browser"],
 
