@@ -20,6 +20,17 @@
         "mercury-ai": ">=0.4.2",
       },
     },
+    "packages/diagrams": {
+      "name": "@mercuryai/diagrams",
+      "version": "0.1.0",
+      "devDependencies": {
+        "bun-types": "latest",
+        "mercury-ai": "0.4.2",
+      },
+      "peerDependencies": {
+        "mercury-ai": ">=0.4.2",
+      },
+    },
     "packages/github": {
       "name": "@mercuryai/github",
       "version": "0.1.0",
@@ -325,6 +336,8 @@
     "@mariozechner/pi-tui": ["@mariozechner/pi-tui@0.55.4", "", { "dependencies": { "@types/mime-types": "^2.1.4", "chalk": "^5.5.0", "get-east-asian-width": "^1.3.0", "koffi": "^2.9.0", "marked": "^15.0.12", "mime-types": "^3.0.1" } }, "sha512-LXoa0CV58lEfzbjXyuUMa4KwoPTzTegPZJEEzuc9p7LnlIn4/eBebhTXQmQ7Hxo+/zb3zpy2qoynKpKcEas9GQ=="],
 
     "@mercuryai/charts": ["@mercuryai/charts@workspace:packages/charts"],
+
+    "@mercuryai/diagrams": ["@mercuryai/diagrams@workspace:packages/diagrams"],
 
     "@mercuryai/github": ["@mercuryai/github@workspace:packages/github"],
 

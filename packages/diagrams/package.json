@@ -1,0 +1,28 @@
+{
+  "name": "@mercuryai/diagrams",
+  "version": "0.1.0",
+  "description": "Mercury extension: diagram generation with Mermaid",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "skill"],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'no tests yet'"
+  },
+  "keywords": ["mercury", "extension"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Michaelliv/mercury-extensions",
+    "directory": "packages/diagrams"
+  },
+  "peerDependencies": {
+    "mercury-ai": ">=0.4.2"
+  },
+  "devDependencies": {
+    "mercury-ai": "0.4.2",
+    "bun-types": "latest"
+  }
+}
