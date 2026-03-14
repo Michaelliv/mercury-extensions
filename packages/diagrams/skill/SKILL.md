@@ -17,7 +17,7 @@ graph TD
   B -->|Yes| C[Do something]
   B -->|No| D[Do other thing]
 EOF
-mmdc -i /tmp/diagram.mmd -o outbox/diagram.png -b transparent
+mmdc -i /tmp/diagram.mmd -o outbox/diagram.png -b transparent -p /root/.puppeteerrc.json
 ```
 
 ### Options
