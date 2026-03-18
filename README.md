@@ -33,7 +33,7 @@ Extensions add capabilities to your Mercury agent — CLIs, skills, background j
 
 For example, the `knowledge` extension:
 - Installs `napkin` CLI in the agent container
-- Creates an Obsidian vault structure per space
+- Creates a napkin vault at `knowledge/.napkin` per space
 - Runs hourly KB distillation to extract knowledge from conversations
 - Provides a dashboard widget showing distillation status
 

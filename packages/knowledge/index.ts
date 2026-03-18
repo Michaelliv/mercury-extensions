@@ -13,19 +13,49 @@ import { join } from "node:path";
 import type { MercuryExtensionAPI } from "mercury-ai/extensions/types";
 
 const KNOWLEDGE_DIR = "knowledge";
-const VAULT_DIRS = ["people", "projects", "references", "daily", "templates"];
+const VAULT_DIR = ".napkin";
+const VAULT_DIRS = ["people", "projects", "references", "daily", "Templates"];
 
 // ---------------------------------------------------------------------------
-// Obsidian configs
+// napkin vault defaults
 // ---------------------------------------------------------------------------
 
-const DAILY_NOTES_CONFIG = JSON.stringify(
-  { folder: "daily", format: "YYYY-MM-DD", template: "templates/Daily Note" },
+const DEFAULT_CONFIG = JSON.stringify(
+  {
+    overview: { depth: 3, keywords: 8 },
+    search: { limit: 30, snippetLines: 0 },
+    daily: { folder: "daily", format: "YYYY-MM-DD" },
+    templates: { folder: "Templates" },
+    distill: {
+      enabled: true,
+      intervalMinutes: 60,
+      model: { provider: "anthropic", id: "claude-sonnet-4-6" },
+      templates: [],
+    },
+    graph: { renderer: "auto" },
+  },
   null,
   2,
 );
 
-const TEMPLATES_CONFIG = JSON.stringify({ folder: "templates" }, null, 2);
+const DAILY_NOTES_CONFIG = JSON.stringify(
+  { folder: "daily", format: "YYYY-MM-DD", template: "Templates/Daily Note" },
+  null,
+  2,
+);
+
+const TEMPLATES_CONFIG = JSON.stringify({ folder: "Templates" }, null, 2);
+const APP_CONFIG = JSON.stringify({ alwaysUpdateLinks: true }, null, 2);
+
+const NAPKIN_MD = `# Mercury Knowledge Vault
+
+This vault stores distilled knowledge from Mercury conversations.
+
+## Purpose
+- Capture durable knowledge about people, projects, and references
+- Maintain daily notes for conversation-derived learnings
+- Serve as structured memory for future sessions
+`;
 
 const DAILY_TEMPLATE = `---
 tags:
@@ -182,17 +212,16 @@ function md5(content: string): string {
   return new Bun.CryptoHasher("md5").update(content).digest("hex");
 }
 
-function exportMessages(db: Database, spaceId: string, messagesDir: string): Set<string> {
+function exportMessages(db: Database, messagesDir: string): Set<string> {
   mkdirSync(messagesDir, { recursive: true });
 
   const rows = db
     .query(
       `SELECT role, content, created_at as createdAt
        FROM messages
-       WHERE space_id = ?
        ORDER BY id ASC`,
     )
-    .all(spaceId) as MessageRow[];
+    .all() as MessageRow[];
 
   const byDate = new Map<string, Array<{ ts: number; role: string; content: string }>>();
   for (const row of rows) {
@@ -271,13 +300,22 @@ export default function (mercury: MercuryExtensionAPI) {
 
   mercury.on("workspace_init", async ({ workspace }) => {
     const knowledgeDir = join(workspace, KNOWLEDGE_DIR);
-    const obsidianDir = join(knowledgeDir, ".obsidian");
-    const napkinDir = join(knowledgeDir, ".napkin");
+    const vaultDir = join(knowledgeDir, VAULT_DIR);
+    const obsidianDir = join(vaultDir, ".obsidian");
 
     mkdirSync(obsidianDir, { recursive: true });
-    mkdirSync(napkinDir, { recursive: true });
     for (const dir of VAULT_DIRS) {
-      mkdirSync(join(knowledgeDir, dir), { recursive: true });
+      mkdirSync(join(vaultDir, dir), { recursive: true });
+    }
+
+    const configPath = join(vaultDir, "config.json");
+    if (!existsSync(configPath)) {
+      writeFileSync(configPath, DEFAULT_CONFIG, "utf8");
+    }
+
+    const napkinMdPath = join(vaultDir, "NAPKIN.md");
+    if (!existsSync(napkinMdPath)) {
+      writeFileSync(napkinMdPath, NAPKIN_MD, "utf8");
     }
 
     const dailyNotesConfig = join(obsidianDir, "daily-notes.json");
@@ -290,7 +328,12 @@ export default function (mercury: MercuryExtensionAPI) {
       writeFileSync(templatesConfig, TEMPLATES_CONFIG, "utf8");
     }
 
-    const dailyTemplatePath = join(knowledgeDir, "templates", "Daily Note.md");
+    const appConfig = join(obsidianDir, "app.json");
+    if (!existsSync(appConfig)) {
+      writeFileSync(appConfig, APP_CONFIG, "utf8");
+    }
+
+    const dailyTemplatePath = join(vaultDir, "Templates", "Daily Note.md");
     if (!existsSync(dailyTemplatePath)) {
       writeFileSync(dailyTemplatePath, DAILY_TEMPLATE, "utf8");
     }
@@ -300,7 +343,7 @@ export default function (mercury: MercuryExtensionAPI) {
 
   mercury.on("before_container", async ({ containerWorkspace }) => {
     return {
-      env: { NAPKIN_VAULT: join(containerWorkspace, KNOWLEDGE_DIR) },
+      env: { NAPKIN_VAULT: join(containerWorkspace, KNOWLEDGE_DIR, VAULT_DIR) },
     };
   });
 
@@ -315,51 +358,44 @@ export default function (mercury: MercuryExtensionAPI) {
 
       try {
         const dbPath = join(ctx.config.dataDir, "state.db");
-        const spacesDir = join(ctx.config.dataDir, "spaces");
+        const workspace = join(ctx.config.dataDir, "workspace");
 
         if (!existsSync(dbPath)) {
           ctx.log.error("Database not found", { dbPath });
           return;
         }
 
-        const db = new Database(dbPath, { readonly: true });
+        const knowledgeDir = join(workspace, KNOWLEDGE_DIR);
+        const vaultDir = join(knowledgeDir, VAULT_DIR);
+        const messagesDir = join(workspace, ".messages");
 
-        const spaces = db.query("SELECT DISTINCT space_id as spaceId FROM messages").all() as {
-          spaceId: string;
-        }[];
-
-        for (const { spaceId } of spaces) {
-          const spaceWorkspace = join(spacesDir, spaceId);
-          const knowledgeDir = join(spaceWorkspace, KNOWLEDGE_DIR);
-          const messagesDir = join(spaceWorkspace, ".messages");
-
-          if (!existsSync(spaceWorkspace)) continue;
-
-          // Ensure knowledge dir exists
-          if (!existsSync(knowledgeDir)) continue;
-
-          const changed = exportMessages(db, spaceId, messagesDir);
-          const dates = changed.has(todayDate()) ? [todayDate()] : [];
-
-          if (dates.length === 0) {
-            ctx.log.debug("No changes to distill", { spaceId });
-            continue;
-          }
-
-          ctx.log.info("Distilling space", { spaceId, dates });
-
-          for (const date of dates) {
-            const dateFile = join(messagesDir, `${date}.jsonl`);
-            const success = await runDistiller(knowledgeDir, dateFile);
-            if (success) {
-              ctx.log.info("Distillation complete", { spaceId, date });
-            } else {
-              ctx.log.error("Distillation failed", { spaceId, date });
-            }
-          }
+        if (!existsSync(vaultDir)) {
+          ctx.log.debug("No napkin vault, skipping distillation");
+          return;
         }
 
+        const db = new Database(dbPath, { readonly: true });
+        const changed = exportMessages(db, messagesDir);
         db.close();
+
+        const dates = changed.has(todayDate()) ? [todayDate()] : [];
+
+        if (dates.length === 0) {
+          ctx.log.debug("No changes to distill");
+          return;
+        }
+
+        ctx.log.info("Distilling", { dates });
+
+        for (const date of dates) {
+          const dateFile = join(messagesDir, `${date}.jsonl`);
+          const success = await runDistiller(vaultDir, dateFile);
+          if (success) {
+            ctx.log.info("Distillation complete", { date });
+          } else {
+            ctx.log.error("Distillation failed", { date });
+          }
+        }
 
         mercury.store.set("last-distill", new Date().toISOString());
         mercury.store.set("last-distill-status", "success");
