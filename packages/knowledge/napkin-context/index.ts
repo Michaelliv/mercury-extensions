@@ -33,21 +33,30 @@ function getOverview(vaultPath: string): string | null {
 }
 
 export default function (pi: ExtensionAPI) {
-  pi.on("before_agent_start", async (event, ctx) => {
+  pi.on("session_start", async (_event, ctx) => {
     const vaultPath = findVaultPath(ctx.cwd);
     if (!vaultPath) return;
+
+    const alreadyInjected = ctx.sessionManager
+      .getEntries()
+      .some(
+        (e) =>
+          e.type === "custom_message" &&
+          (e as any).customType === "napkin-context",
+      );
+    if (alreadyInjected) return;
 
     const overview = getOverview(vaultPath);
     if (!overview) return;
 
-    return {
-      systemPrompt:
-        event.systemPrompt +
-        "\n\n## Knowledge vault\n" +
+    ctx.sessionManager.appendCustomMessageEntry(
+      "napkin-context",
+      "## Knowledge vault\n" +
         "You have access to a napkin vault (Obsidian-compatible knowledge base). " +
         "Here is the vault overview. Use `napkin search <query>` to find specific content, " +
         "`napkin read <file>` to open files.\n\n" +
         overview,
-    };
+      true,
+    );
   });
 }
