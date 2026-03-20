@@ -341,10 +341,12 @@ export default function (mercury: MercuryExtensionAPI) {
     // Install napkin-context pi extension for vault awareness
     const piExtDir = join(workspace, ".pi", "extensions", "napkin-context");
     mkdirSync(piExtDir, { recursive: true });
-    const srcExt = join(import.meta.dir, "pi-extension", "index.ts");
-    if (existsSync(srcExt)) {
-      const destExt = join(piExtDir, "index.ts");
-      writeFileSync(destExt, readFileSync(srcExt, "utf-8"), "utf-8");
+    const srcDir = join(import.meta.dir, "pi-extension");
+    for (const file of ["index.ts", "package.json"]) {
+      const src = join(srcDir, file);
+      if (existsSync(src)) {
+        writeFileSync(join(piExtDir, file), readFileSync(src, "utf-8"), "utf-8");
+      }
     }
 
     return undefined;
