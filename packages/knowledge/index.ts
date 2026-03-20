@@ -338,12 +338,21 @@ export default function (mercury: MercuryExtensionAPI) {
       writeFileSync(dailyTemplatePath, DAILY_TEMPLATE, "utf8");
     }
 
+    // Install napkin-context pi extension for vault awareness
+    const piExtDir = join(workspace, ".pi", "extensions", "napkin-context");
+    mkdirSync(piExtDir, { recursive: true });
+    const srcExt = join(import.meta.dir, "pi-extension", "index.ts");
+    if (existsSync(srcExt)) {
+      const destExt = join(piExtDir, "index.ts");
+      writeFileSync(destExt, readFileSync(srcExt, "utf-8"), "utf-8");
+    }
+
     return undefined;
   });
 
-  mercury.on("before_container", async ({ containerWorkspace }) => {
+  mercury.on("before_container", async ({ workspace }) => {
     return {
-      env: { NAPKIN_VAULT: join(containerWorkspace, KNOWLEDGE_DIR, VAULT_DIR) },
+      env: { NAPKIN_VAULT: join(workspace, KNOWLEDGE_DIR, VAULT_DIR) },
     };
   });
 
