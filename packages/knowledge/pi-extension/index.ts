@@ -26,7 +26,6 @@ function getOverview(vaultPath: string): string | null {
     }).trim();
     return output || null;
   } catch {
-    // Fallback to reading NAPKIN.md directly
     const napkinPath = path.join(vaultPath, "NAPKIN.md");
     if (!fs.existsSync(napkinPath)) return null;
     return fs.readFileSync(napkinPath, "utf-8").trim();
@@ -34,48 +33,21 @@ function getOverview(vaultPath: string): string | null {
 }
 
 export default function (pi: ExtensionAPI) {
-  let hasVault = false;
-
-  pi.on("session_start", async (_event, ctx) => {
+  pi.on("before_agent_start", async (event, ctx) => {
     const vaultPath = findVaultPath(ctx.cwd);
     if (!vaultPath) return;
 
     const overview = getOverview(vaultPath);
-    hasVault = !!overview;
+    if (!overview) return;
 
-    if (overview) {
-      // Check if we already injected context in this session
-      const alreadyInjected = ctx.sessionManager
-        .getEntries()
-        .some(
-          (e) =>
-            e.type === "custom_message" &&
-            (e as any).customType === "napkin-context",
-        );
-
-      if (!alreadyInjected) {
-        ctx.sessionManager.appendCustomMessageEntry(
-          "napkin-context",
-          "## Napkin vault context\n" +
-            "You have access to a napkin vault (Obsidian-compatible knowledge base). " +
-            "Here is the vault overview. Use `napkin search <query>` to find specific content, " +
-            "`napkin read <file>` to open files.\n\n" +
-            overview,
-          true,
-        );
-      }
-    }
-
-    if (ctx.hasUI) {
-      const theme = ctx.ui.theme;
-      if (hasVault) {
-        ctx.ui.setStatus("napkin", "🧻" + theme.fg("dim", " napkin"));
-      } else {
-        ctx.ui.setStatus(
-          "napkin",
-          theme.fg("dim", "napkin: no NAPKIN.md"),
-        );
-      }
-    }
+    return {
+      systemPrompt:
+        event.systemPrompt +
+        "\n\n## Knowledge vault\n" +
+        "You have access to a napkin vault (Obsidian-compatible knowledge base). " +
+        "Here is the vault overview. Use `napkin search <query>` to find specific content, " +
+        "`napkin read <file>` to open files.\n\n" +
+        overview,
+    };
   });
 }
