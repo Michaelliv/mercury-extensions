@@ -4,6 +4,9 @@ import { execSync } from "node:child_process";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 function findVaultPath(cwd: string): string | null {
+  const envVault = process.env.NAPKIN_VAULT;
+  if (envVault && fs.existsSync(envVault)) return envVault;
+
   let dir = cwd;
   while (dir !== path.dirname(dir)) {
     const napkinDir = path.join(dir, ".napkin");
