@@ -368,8 +368,9 @@ export default function (mercury: MercuryExtensionAPI) {
       ctx.log.info("Running KB distillation");
 
       try {
-        const dbPath = join(ctx.config.dataDir, "state.db");
-        const workspace = join(ctx.config.dataDir, "workspace");
+        const root = ctx.config.projectRoot ?? ctx.config.dataDir ?? ".";
+        const dbPath = join(root, "state.db");
+        const workspace = join(root, "workspace");
 
         if (!existsSync(dbPath)) {
           ctx.log.error("Database not found", { dbPath });
