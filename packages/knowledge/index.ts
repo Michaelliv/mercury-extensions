@@ -212,16 +212,17 @@ function md5(content: string): string {
   return new Bun.CryptoHasher("md5").update(content).digest("hex");
 }
 
-function exportMessages(db: Database, messagesDir: string): Set<string> {
+function exportMessages(db: Database, messagesDir: string, workspaceId: number): Set<string> {
   mkdirSync(messagesDir, { recursive: true });
 
   const rows = db
     .query(
       `SELECT role, content, created_at as createdAt
        FROM messages
+       WHERE workspace_id = ?
        ORDER BY id ASC`,
     )
-    .all() as MessageRow[];
+    .all(workspaceId) as MessageRow[];
 
   const byDate = new Map<string, Array<{ ts: number; role: string; content: string }>>();
   for (const row of rows) {
@@ -245,6 +246,11 @@ function exportMessages(db: Database, messagesDir: string): Set<string> {
   }
 
   return changed;
+}
+
+interface WorkspaceRow {
+  id: number;
+  name: string;
 }
 
 function runDistiller(vaultDir: string, dateFile: string): Promise<boolean> {
@@ -368,49 +374,58 @@ export default function (mercury: MercuryExtensionAPI) {
       ctx.log.info("Running KB distillation");
 
       try {
-        const root = ctx.config.projectRoot ?? ctx.config.dataDir ?? ".";
-        const dbPath = join(root, "state.db");
-        const workspace = join(root, "workspace");
+        const workspacesDir = ctx.config.workspacesDir;
+        const dbPath = join(ctx.config.workspacesDir, "..", "state.db");
 
         if (!existsSync(dbPath)) {
           ctx.log.error("Database not found", { dbPath });
           return;
         }
 
-        const knowledgeDir = join(workspace, KNOWLEDGE_DIR);
-        const vaultDir = join(knowledgeDir, VAULT_DIR);
-        const messagesDir = join(workspace, ".messages");
-
-        if (!existsSync(vaultDir)) {
-          ctx.log.debug("No napkin vault, skipping distillation");
-          return;
-        }
-
         const db = new Database(dbPath, { readonly: true });
-        const changed = exportMessages(db, messagesDir);
-        db.close();
+        const workspaces = db
+          .query("SELECT id, name FROM workspaces")
+          .all() as WorkspaceRow[];
 
-        const dates = changed.has(todayDate()) ? [todayDate()] : [];
+        let anyDistilled = false;
 
-        if (dates.length === 0) {
-          ctx.log.debug("No changes to distill");
-          return;
-        }
+        for (const ws of workspaces) {
+          const wsDir = join(workspacesDir, ws.name);
+          const knowledgeDir = join(wsDir, KNOWLEDGE_DIR);
+          const vaultDir = join(knowledgeDir, VAULT_DIR);
+          const messagesDir = join(wsDir, ".messages");
 
-        ctx.log.info("Distilling", { dates });
+          if (!existsSync(vaultDir)) {
+            ctx.log.debug("No napkin vault, skipping", { workspace: ws.name });
+            continue;
+          }
 
-        for (const date of dates) {
-          const dateFile = join(messagesDir, `${date}.jsonl`);
-          const success = await runDistiller(vaultDir, dateFile);
-          if (success) {
-            ctx.log.info("Distillation complete", { date });
-          } else {
-            ctx.log.error("Distillation failed", { date });
+          const changed = exportMessages(db, messagesDir, ws.id);
+          const dates = changed.has(todayDate()) ? [todayDate()] : [];
+
+          if (dates.length === 0) {
+            ctx.log.debug("No changes to distill", { workspace: ws.name });
+            continue;
+          }
+
+          ctx.log.info("Distilling", { workspace: ws.name, dates });
+
+          for (const date of dates) {
+            const dateFile = join(messagesDir, `${date}.jsonl`);
+            const success = await runDistiller(vaultDir, dateFile);
+            if (success) {
+              ctx.log.info("Distillation complete", { workspace: ws.name, date });
+              anyDistilled = true;
+            } else {
+              ctx.log.error("Distillation failed", { workspace: ws.name, date });
+            }
           }
         }
 
+        db.close();
+
         mercury.store.set("last-distill", new Date().toISOString());
-        mercury.store.set("last-distill-status", "success");
+        mercury.store.set("last-distill-status", anyDistilled ? "success" : "no-changes");
         ctx.log.info("KB distillation complete");
       } catch (err) {
         mercury.store.set("last-distill", new Date().toISOString());
